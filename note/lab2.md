@@ -55,6 +55,7 @@ int main() {
 
 - `[[nodiscard]]` 是 C++17 引入的一个属性，用于指示函数的返回值不应被忽略。当一个函数被标记为 [[nodiscard]]，如果调用该函数但不使用其返回值，编译器将发出警告或错误。这对于那些返回值表示状态、错误或对程序逻辑至关重要的函数特别有用。
 
+- `int system(const char* command);`,是一个用于在 C++ 程序中执行操作系统命令的标准库函数。它的声明在 <cstdlib> 头文件中。该函数的原型如下。
 1. 错误状态检查：对于那些返回错误码或状态的函数，使用 `[[nodiscard]]` 可以确保调用者检查这些返回值，从而避免错误被忽视
 ```cpp
 #include <iostream>
@@ -105,3 +106,50 @@ int main() {
 
 ## 测试结果
 ![](assets/2024-06-05-23-15-56.png)
+
+
+## 集成测试框架
+
+首先是在测试框架中将之前需要手动编译执行得到的二进制指令文件通过函数包装
+
+```cpp
+void generate_rv_assembly(const std::string& c_src) {}
+
+void generate_rv_obj(const std::string& assembly) {}
+
+void generate_rv_binary(const std::string& obj) { }
+```
+
+然后就是每次根据不同的测试用例初始胡不同的CPU，需要需要一个`rv_helper()`函数
+
+```cpp
+// 生成测试用的Cpu实例，code是测试指令，test_name是测试用例名称，n_clock是周期数
+// 比如 code = "addi x31, x0, 0" test_name = "test-addi"
+Cpu rv_helper(const std::string &code, const std::string &test_name,
+              size_t n_clock) {
+```
+
+然后就是编写测试用例，这里的code是实际的指令，`test-addi`是测试名称，测试过程中好像不会生成具体的文件，具体原因未知
+```cpp
+// Test addi instruction
+TEST(RVTests, TestAddi) {
+    std::string code = start + "addi x31, x0, 42 \n";
+    Cpu cpu = rv_helper(code, "test_addi", 1);
+    EXPECT_EQ(cpu.regs[31], 42)
+        << "Error: x31 should be 42 after ADDI instruction";
+}
+```
+
+由于在`g_test.cc`文件中引用了`cpu.hh`中定义的函数，所以在构建测试可执行文件`g_test`时需要链接`common_library`
+
+```cmake
+# 将 GTest::gtest_main 库链接到 g_test 可执行文件中。GTest::gtest_main 是 Google Test 提供的一个目标，包含了主测试入口
+# 由于使用了rv_helper，所以同样需要链接common_library
+target_link_libraries(
+        g_test
+        common_library
+        GTest::gtest_main
+)
+```
+测试结果如图：
+![](assets/2024-06-07-17-25-45.png)

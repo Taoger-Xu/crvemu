@@ -39,8 +39,10 @@ add_executable(
 )
 
 # 将 GTest::gtest_main 库链接到 g_test 可执行文件中。GTest::gtest_main 是 Google Test 提供的一个目标，包含了主测试入口
+# 由于使用了rv_helper，所以同样需要链接common_library
 target_link_libraries(
         g_test
+        common_library
         GTest::gtest_main
 )
 
