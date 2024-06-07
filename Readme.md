@@ -11,7 +11,5 @@
 | NAME | LINK |
 | ------ | ------ |
 | ✨Lab0 | [实验环境搭建](./note/lab0.md) |
-| ✨Lab2 | [最简CPU](./note/lab1.md) |
-| ✨Lab3| [内存和总线](./note/lab2.md) |
-| ✨Lab4| [RISC-V Calling Convention](https://github.com/Taoger-Xu/cs61c-22FA/tree/master/labs/lab04) |
-| ✨Lab5| [Logisim](https://github.com/Taoger-Xu/cs61c-22FA/tree/master/labs/lab05) |
+| ✨Lab1 | [最简CPU](./note/lab1.md) |
+| ✨Lab2| [内存和总线](./note/lab2.md) |
